@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kil Fantorangen - Husarbeid!</title>
+  <style>
+    :root {
+      --primary-color: #ff6b6b;
+      --secondary-color: #4ecdc4;
+      --bg-color: #f7f9fc;
+      --success-color: #2ecc71;
+      --warning-color: #f39c12;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .header-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 5px;
+    }
+
+    .status-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+    }
+
+    .level-badge {
+      background: #ffe66d;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .music-btn {
+      background: #ff7675;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+      box-shadow: 0 3px 0 #d63031;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background-color: var(--success-color);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .character-container {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin: 0 auto;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 5px solid #ff6b6b;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+      background-color: #ff6b6b;
+    }
+
+    .character-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.1s ease;
+    }
+
+    .giggle {
+      animation: shake 0.3s infinite;
+    }
+
+    @keyframes shake {
+      0% { transform: rotate(0deg) scale(1.08); }
+      25% { transform: rotate(-8deg) scale(1.08); }
+      75% { transform: rotate(8deg) scale(1.08); }
+      100% { transform: rotate(0deg) scale(1.08); }
+    }
+
+    .speech-bubble {
+      background: #e3f2fd;
+      border-radius: 15px;
+      padding: 15px;
+      margin: 20px 0;
+      font-size: 1.1rem;
+      min-height: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .ai-status {
+      font-size: 0.8rem;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+
+    .btn {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      box-shadow: 0 4px 0 #38b2ac;
+      transition: all 0.1s;
+      display: inline-block;
+      box-sizing: border-box;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    #camera-section {
+      display: none;
+      margin-top: 15px;
+    }
+
+    #photo-preview {
+      display: none;
+      width: 100%;
+      border-radius: 15px;
+      margin-bottom: 10px;
+    }
+
+    #cameraInput {
+      display: none;
+    }
+
+    /* Seiersskjerm */
+    #victory-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.85);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .victory-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .prize-card {
+      background: #ffe66d;
+      border: 3px dashed #f39c12;
+      border-radius: 15px;
+      padding: 20px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #333;
+      margin: 15px 0;
+      box-shadow: 0 4px 0 #e67e22;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="main-game-card">
+    <div class="header-row">
+      <div class="status-container">
+        <div class="level-badge">Nivå <span id="level-num">1</span> / 5</div>
+        <button class="music-btn" id="musicToggle">🔇 Musikk AV</button>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Karakterbilde: Originalt NRK-bilde -->
+    <div class="character-container" id="fantorangen-btn">
+      <img src="https://gfx.nrk.no/LLMd7TuW-3UTSeSGom2LhQQcXbJsk3Ah_vQRqOszAIWw" alt="Fantorangen og Pivi" class="character-img" id="character-img">
+    </div>
+
+    <div class="speech-bubble" id="dialogue">
+      Slå på musikk (valgfritt) og trykk på Fantorangen for å kile ham!
+      <div class="ai-status">✨ Klar til dyst!</div>
+    </div>
+
+    <div id="camera-section">
+      <img id="photo-preview" alt="Bilde av fullført oppgave">
+      <input type="file" id="cameraInput" accept="image/*" capture="environment">
+      <label for="cameraInput" class="btn" id="capture-btn">📷 Ta bilde av jobben!</label>
+      
+      <button class="btn" id="ai-analyze-btn" style="display:none; background-color: var(--warning-color); box-shadow: 0 4px 0 #d35400;">
+        La Pivi sjekke bildet
+      </button>
+
+      <button class="btn" id="approve-btn" style="display:none; background-color: var(--success-color); box-shadow: 0 4px 0 #27ae60;">
+        ✅ Fullfør oppgave!
+      </button>
+    </div>
+  </div>
+
+  <!-- Seiersskjerm -->
+  <div id="victory-screen">
+    <div class="victory-card">
+      <div style="font-size: 3rem;">🎉🏆🎉</div>
+      <h2 style="margin: 5px 0;">HURRA! DU VANT!</h2>
+      <p style="margin: 5px 0; font-size: 0.95rem;">Du har fullført alle 5 nivåene! Spillet har trukket dette premiekortet til deg:</p>
+      
+      <div class="prize-card" id="drawn-prize-card">
+        <!-- Trukket premie vises her -->
+      </div>
+
+      <p style="font-size: 0.9rem; color: #7f8c8d;">Vis dette premiekortet til en voksen!</p>
+      <button class="btn" onclick="location.reload()" style="margin-top: 10px;">Spill igjen!</button>
+    </div>
+  </div>
+
+  <script>
+    const REQUIRED_TICKLES = 5;
+    const MAX_LEVEL = 5;
+    
+    // 10 Helårs-premier uten skjerm/godteri eller krevende utstyr
+    const PREMIEKORTSTOKK = [
+      "🍕 Du kan velge hva familien skal ha til middag!",
+      "🎲 Velg et brettspill som vi skal spille sammen!",
+      "⛺ Bygg et fort eller hytte i stua med stoler og tepper!",
+      "📖 Velg 3 bøker som en voksen skal lese for deg på senga!",
+      "🍰 Få være med å bake noe godt sammen på kjøkkenet!",
+      "🎵 Ha diskotek i stua med din favorittmusikk!",
+      "🎨 Få en hel time med tegning, maling eller perling sammen med en voksen!",
+      "🛌 Få lov til å være oppe 15 minutter lenger i kveld!",
+      "👑 Få bestemme hvilken lek vi skal leke sammen i dag!",
+      "💆 Få en god og myk rygg- eller fotmassasje mens vi slapper av!"
+    ];
+
+    // 5 generelle, bildevennlige oppgaver
+    const OPPGAVER = [
+      { id: "rommet", tekst: "Raddidaddida! Kan du rydde rommet ditt og legge ting på plass?" },
+      { id: "gangen", tekst: "Prikk prikk rekk! Kan du rydde gangen? Sett sko i hylla og heng klær på knaggen!" },
+      { id: "skittentoy", tekst: "Kili-kili! Kan du samle opp skittentøy og legge det i skittentøykurven?" },
+      { id: "seng", tekst: "Nå lo jeg godt! Kan du reie opp senga di så den blir fin?" },
+      { id: "soppel", tekst: "Sjøbanan! Kan du gå ut med søppela og ta et bilde av søppelbøtta?" }
+    ];
+
+    let level = 1;
+    let tickleCount = 0;
+    let currentTask = null;
+
+    const lydKiling = ["HIHIHI!", "HAHA! Det kiler!", "IKKE KIL MEG!", "RADDIDADDI! HAHA!", "Sjøbanan!", "Prikk prikk rekk!"];
+
+    let musicPlaying = false;
+    let audioCtx = null;
+    let musicInterval = null;
+
+    const characterImg = document.getElementById('character-img');
+    const fantorangenBtn = document.getElementById('fantorangen-btn');
+    const dialogue = document.getElementById('dialogue');
+    const cameraSection = document.getElementById('camera-section');
+    const cameraInput = document.getElementById('cameraInput');
+    const photoPreview = document.getElementById('photo-preview');
+    const captureBtn = document.getElementById('capture-btn');
+    const aiAnalyzeBtn = document.getElementById('ai-analyze-btn');
+    const approveBtn = document.getElementById('approve-btn');
+    const levelNum = document.getElementById('level-num');
+    const progressFill = document.getElementById('progress-fill');
+    const musicToggle = document.getElementById('musicToggle');
+    const victoryScreen = document.getElementById('victory-screen');
+    const drawnPrizeCard = document.getElementById('drawn-prize-card');
+
+    function startMusic() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const notes = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63]; 
+      let index = 0;
+
+      musicInterval = setInterval(() => {
+        if (!musicPlaying) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(notes[index], audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+
+        index = (index + 1) % notes.length;
+      }, 350);
+    }
+
+    musicToggle.addEventListener('click', () => {
+      musicPlaying = !musicPlaying;
+      if (musicPlaying) {
+        musicToggle.innerText = "🎵 Musikk PÅ";
+        musicToggle.style.background = "#00b894";
+        startMusic();
+      } else {
+        musicToggle.innerText = "🔇 Musikk AV";
+        musicToggle.style.background = "#ff7675";
+        if (musicInterval) clearInterval(musicInterval);
+      }
+    });
+
+    function updateProgressBar() {
+      const percentage = (level - 1) / (MAX_LEVEL - 1) * 100;
+      progressFill.style.width = `${percentage}%`;
+    }
+
+    const handleTickle = () => {
+      if (currentTask) return; 
+
+      tickleCount++;
+      characterImg.classList.add('giggle');
+
+      const tilfeldigLyd = lydKiling[Math.floor(Math.random() * lydKiling.length)];
+      dialogue.innerHTML = `${tilfeldigLyd}<div class="ai-status">✨ Klar til dyst!</div>`;
+
+      setTimeout(() => characterImg.classList.remove('giggle'), 300);
+
+      if (tickleCount >= REQUIRED_TICKLES) {
+        giveTask();
+      }
+    };
+
+    fantorangenBtn.addEventListener('click', handleTickle);
+
+    function giveTask() {
+      currentTask = OPPGAVER[(level - 1) % OPPGAVER.length];
+      dialogue.innerHTML = `${currentTask.tekst}<br>Ta et bilde når du er ferdig!<div class="ai-status">✨ Klar til dyst!</div>`;
+      cameraSection.style.display = 'block';
+    }
+
+    cameraInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          photoPreview.src = e.target.result;
+          photoPreview.style.display = 'block';
+          captureBtn.style.display = 'none';
+          aiAnalyzeBtn.style.display = 'inline-block';
+          
+          dialogue.innerHTML = `Trykk under så Pivi kan sjekke bildet...<div class="ai-status">✨ Pivi er klar!</div>`;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    aiAnalyzeBtn.addEventListener('click', async () => {
+      aiAnalyzeBtn.disabled = true;
+      aiAnalyzeBtn.innerText = "Pivi sjekker bildet...";
+
+      await new Promise(r => setTimeout(r, 1200)); 
+
+      dialogue.innerHTML = `Pivi sier: "Fantastisk! Bildet er godkjent! Du har gjort en kjempejobb!"<div class="ai-status">✨ Godkjent av Pivi!</div>`;
+      approveBtn.style.display = 'inline-block';
+      aiAnalyzeBtn.style.display = 'none';
+    });
+
+    approveBtn.addEventListener('click', () => {
+      if (level >= MAX_LEVEL) {
+        showVictoryScreen();
+        if (musicInterval) clearInterval(musicInterval);
+        return;
+      }
+
+      level++;
+      levelNum.innerText = level;
+      updateProgressBar();
+      tickleCount = 0;
+      currentTask = null;
+
+      cameraSection.style.display = 'none';
+      photoPreview.style.display = 'none';
+      captureBtn.style.display = 'inline-block';
+      aiAnalyzeBtn.style.display = 'none';
+      aiAnalyzeBtn.disabled = false;
+      aiAnalyzeBtn.innerText = "La Pivi sjekke bildet";
+      approveBtn.style.display = 'none';
+      cameraInput.value = ""; 
+
+      dialogue.innerHTML = `Hurra! Du gikk opp i nivå! Kil Fantorangen igjen for en ny oppgave!<div class="ai-status">✨ Klar til dyst!</div>`;
+    });
+
+    function showVictoryScreen() {
+      const randomPrize = PREMIEKORTSTOKK[Math.floor(Math.random() * PREMIEKORTSTOKK.length)];
+      drawnPrizeCard.innerText = randomPrize;
+      victoryScreen.style.display = 'flex';
+    }
+
+    updateProgressBar();
+  </script>
+</body>
+</html>
