@@ -5,7 +5,7 @@
   "name": "Kil Fantorangen - Husarbeid",
   "short_name": "Fantorangen",
   "description": "Et morsomt spill for barn som gjør husarbeid til en lek!",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#f7f9fc",
   "theme_color": "#ff6b6b",
   "orientation": "portrait",
