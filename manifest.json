@@ -1,8 +1,10 @@
 {
+  "id": "/Ryddespill/",
+  "start_url": "/Ryddespill/index.html",
+  "scope": "/Ryddespill/",
   "name": "Kil Fantorangen - Husarbeid",
   "short_name": "Fantorangen",
   "description": "Et morsomt spill for barn som gjør husarbeid til en lek!",
-  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f7f9fc",
   "theme_color": "#ff6b6b",
